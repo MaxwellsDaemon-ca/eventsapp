@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Events</title>
+</head>
+<body>
+    <div layout:fragment="content">
+    <h1>Events</h1>
+    <h2 th:text="${message}"></h2>
+    <a sec:authorize="hasRole('ADMIN')" href="/events/create">Create New Event</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Organizer ID</th>
+                <th>Description</th>
+                <th sec:authorize="hasRole('ADMIN')">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="event : ${events}">
+                <td th:text="${event.id}">1</td>
+                <td th:text="${event.name}">Sample Event</td>
+                <td th:text="${#dates.format(event.date, 'dd-MMM-yyyy')}">2024-01-01</td>
+                <td th:text="${event.location}">Sample Location</td>
+                <td th:text="${event.organizerid}">10</td>
+                <td th:utext="${event.description}">Sample Description</td>
+                <td sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/events/edit/{id}(id=${event.id})}">Edit</a>
+                    <a th:href="@{/events/delete/{id}(id=${event.id})}">Delete</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!-- layout.html -->
+
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <head>
+    <title th:text="${pageTitle}"></title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+  </head>
+  <body>
+    <nav>
+      <ul>
+        <li><a th:href="@{/users/}">Home</a></li>
+        <li sec:authorize="isAnonymous()">
+          <a th:href="@{/users/register}">Register</a>
+        </li>
+        <li sec:authorize="isAnonymous()">
+          <a th:href="@{/users/loginForm}">Login</a>
+        </li>
+        <li sec:authorize="isAuthenticated()">
+          <a th:href="@{/users/logout}">Logout</a>
+        </li>
+        <li><a th:href="@{/events}">Events</a></li>
+        <li sec:authorize="hasRole('ADMIN')">
+          <a th:href="@{/events/create}">Create Event</a>
+        </li>
+        <li><a th:href="@{/events/search}">Search Events</a></li>
+
+        <li>
+          <span sec:authorize="isAnonymous()">Not Logged In</span>
+
+          <span
+            sec:authorize="isAuthenticated()"
+            style="display: flex; gap: 8px; align-items: center"
+          >
+            Logged in as: <span sec:authentication="name"></span>
+            <span
+              th:each="authority : ${#authentication.authorities}"
+              th:text="${authority.authority}"
+            ></span>
+          </span>
+        </li>
+      </ul>
+    </nav>
+    <div layout:fragment="content">
+      <!-- Content will be inserted here -->
+    </div>
+  </body>
+</html>
+<!-- end of file -->
