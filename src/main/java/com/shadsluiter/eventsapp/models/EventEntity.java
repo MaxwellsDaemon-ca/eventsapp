@@ -18,7 +18,7 @@ public class EventEntity {
     
     private String name;
     
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = "MM/dd/yyyy")
     private Date date;
     
     private String location;
