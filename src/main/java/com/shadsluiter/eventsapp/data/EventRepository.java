@@ -41,19 +41,21 @@ public class EventRepository implements EventRepositoryInterface {
 
     @Override
     public EventEntity save(EventEntity event) {
-        if (event.getId() == null) {
-            String sql = "INSERT INTO events (name, date, location, organizerid, description) " +
-                         "VALUES ('" + event.getName() + "', '" + event.getDate() + "', '" + event.getLocation() + "', '" + event.getOrganizerid() + "', '" + event.getDescription() + "')";
-            jdbcTemplate.update(sql);
-            Long id = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Long.class);
-            event.setId(id);
-        } else {
-            String sql = "UPDATE events SET name = '" + event.getName() + "', date = '" + event.getDate() + "', location = '" + event.getLocation() + "', organizerid = '" + event.getOrganizerid() + "', description = '" + event.getDescription() + 
-                         "' WHERE id = " + event.getId();
-            jdbcTemplate.update(sql);
-        }
+        String sql = "INSERT INTO events (name, date, location, organizerid, description) " +
+                    "VALUES (?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sql,
+            event.getName(),
+            event.getDate(),
+            event.getLocation(),
+            event.getOrganizerid(),
+            event.getDescription()
+        );
+        Long id = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Long.class);
+        event.setId(id);
         return event;
     }
+
+
 
     @Override
     public EventEntity findById(Long id) {

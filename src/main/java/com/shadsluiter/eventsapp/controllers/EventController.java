@@ -59,6 +59,7 @@ public class EventController {
     public String showCreateEventForm(Model model) {
         model.addAttribute("event", new EventModel());
         model.addAttribute("pageTitle", "Create Event");
+        System.out.println("Rendering event form, model contains: " + model.asMap());
 
         // Populate user dropdown
         List<UserModel> users = userService.findAll();  
@@ -75,6 +76,7 @@ public class EventController {
     @PostMapping("/create")
     public String createEvent(@ModelAttribute @Valid EventModel event, BindingResult result, Model model) {
         if (result.hasErrors()) {
+            model.addAttribute("event", event);
             model.addAttribute("pageTitle", "Create Event");
 
             // Repopulate user dropdown on validation error

@@ -10,7 +10,7 @@ public class EventModel {
     
     private String name;
     
-    @DateTimeFormat(pattern = "MM/dd/yyyy")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date date;
     
     private String location;

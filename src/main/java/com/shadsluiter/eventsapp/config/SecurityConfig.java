@@ -56,7 +56,7 @@ public class SecurityConfig {
     @Order(2)
     public SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-            .securityMatcher("/**")
+            .securityMatcher(request -> !request.getRequestURI().startsWith("/api/"))
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .authorizeHttpRequests(auth -> auth

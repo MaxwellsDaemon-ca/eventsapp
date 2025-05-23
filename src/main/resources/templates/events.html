@@ -28,7 +28,7 @@
                 <td th:text="${#dates.format(event.date, 'dd-MMM-yyyy')}">2024-01-01</td>
                 <td th:text="${event.location}">Sample Location</td>
                 <td th:text="${event.organizerid}">10</td>
-                <td th:utext="${event.description}">Sample Description</td>
+                <td th:text="${event.description}">Sample Description</td>
                 <td sec:authorize="hasRole('ADMIN')">
                     <a th:href="@{/events/edit/{id}(id=${event.id})}">Edit</a>
                     <a th:href="@{/events/delete/{id}(id=${event.id})}">Delete</a>
