@@ -23,8 +23,8 @@ public class EventRepository implements EventRepositoryInterface {
 
     @Override
     public List<EventEntity> findByOrganizerid(Long organizerid) {
-        String sql = "SELECT * FROM events WHERE organizerid = " + organizerid;
-        return jdbcTemplate.query(sql, new EventModelRowMapper());
+        String sql = "SELECT * FROM events WHERE organizerid = ?";
+        return jdbcTemplate.query(sql, new Object[]{organizerid}, new EventModelRowMapper());
     }
 
     @Override
@@ -35,8 +35,8 @@ public class EventRepository implements EventRepositoryInterface {
 
     @Override
     public void deleteById(Long id) {
-        String sql = "DELETE FROM events WHERE id = " + id;
-        jdbcTemplate.update(sql);
+        String sql = "DELETE FROM events WHERE id = ?";
+        jdbcTemplate.update(sql, id);
     }
 
     @Override
@@ -59,14 +59,14 @@ public class EventRepository implements EventRepositoryInterface {
 
     @Override
     public EventEntity findById(Long id) {
-        String sql = "SELECT * FROM events WHERE id = " + id;
-        return jdbcTemplate.queryForObject(sql, new EventModelRowMapper());
+        String sql = "SELECT * FROM events WHERE id = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{id}, new EventModelRowMapper());
     }
 
     @Override
     public boolean existsById(Long id) {
-        String sql = "SELECT COUNT(*) FROM events WHERE id = " + id;
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class);
+        String sql = "SELECT COUNT(*) FROM events WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, new Object[]{id}, Integer.class);
         return count != null && count > 0;
     }
 
@@ -86,7 +86,8 @@ public class EventRepository implements EventRepositoryInterface {
 
     @Override
     public List<EventEntity> findByDescription(String description) { 
-        String sql = "SELECT * FROM events WHERE description LIKE '%" + description + "%'";
-        return jdbcTemplate.query(sql, new EventModelRowMapper());
+        String sql = "SELECT * FROM events WHERE description LIKE ?";
+        return jdbcTemplate.query(sql, ps -> ps.setString(1, "%" + description + "%"), new EventModelRowMapper());
+
     }
 }

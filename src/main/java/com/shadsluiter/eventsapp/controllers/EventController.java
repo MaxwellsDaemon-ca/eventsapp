@@ -11,6 +11,7 @@ import com.shadsluiter.eventsapp.models.EventSearch;
 import com.shadsluiter.eventsapp.models.UserModel;
 import com.shadsluiter.eventsapp.service.EventService;
 import com.shadsluiter.eventsapp.service.UserService;
+import com.shadsluiter.eventsapp.security.InputSanitizer;
 
 import jakarta.validation.Valid;
 import java.util.List;
@@ -154,6 +155,15 @@ public class EventController {
         if (result.hasErrors()) {
             return "searchForm";
         }
+
+        try {
+            // Sanitize the search string to prevent XSS and SQL injection
+            eventSearch.setSearchString(InputSanitizer.sanitizeInput(eventSearch.getSearchString()));
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", "Invalid search input: " + e.getMessage());
+            return "searchForm";
+        }
+        
 
         List<EventModel> events = eventService.findByDescription(eventSearch.getSearchString());
         model.addAttribute("message", "Search results for " + eventSearch.getSearchString());

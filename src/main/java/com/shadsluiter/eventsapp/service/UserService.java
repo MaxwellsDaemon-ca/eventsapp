@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.shadsluiter.eventsapp.data.UserRepository;
 import com.shadsluiter.eventsapp.models.UserEntity;
 import com.shadsluiter.eventsapp.models.UserModel;
+import com.shadsluiter.eventsapp.security.InputSanitizer;
 
 /**
  * Service class for managing user data and authentication logic.
@@ -64,6 +65,7 @@ public class UserService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        username = InputSanitizer.sanitizeUsername(username);
         UserEntity userEntity = userRepository.findByLoginName(username);
         if (userEntity == null) {
             throw new UsernameNotFoundException("User not found");
@@ -84,6 +86,7 @@ public class UserService implements UserDetailsService {
      * @return a UserModel if found, otherwise null
      */
     public UserModel findByLoginName(String loginName) {
+        loginName = InputSanitizer.sanitizeUsername(loginName);
         UserEntity userEntity = userRepository.findByLoginName(loginName);
         if (userEntity == null) {
             return null;
@@ -99,7 +102,9 @@ public class UserService implements UserDetailsService {
      * @param user the user with credentials to verify
      * @return true if password matches, false otherwise
      */
-    public boolean verifyPassword(UserModel user) {
+    public boolean verifyPassword(UserModel user) { 
+        user.setUserName(InputSanitizer.sanitizeUsername(user.getUserName()));
+        user.setPassword(InputSanitizer.sanitizePassword(user.getPassword()));
         UserEntity userEntity = userRepository.findByLoginName(user.getUserName());
         if (userEntity == null) {
             return false;

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.shadsluiter.eventsapp.models.UserModel;
 import com.shadsluiter.eventsapp.service.UserService;
+import com.shadsluiter.eventsapp.security.InputSanitizer;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -55,6 +56,9 @@ public class UsersController {
      */
     @PostMapping("/register")
     public String registerUser(@ModelAttribute UserModel user, Model model) {
+        // Sanitize input to prevent XSS and SQL injection
+        user.setUserName(InputSanitizer.sanitizeUsername(user.getUserName()));
+        user.setPassword(InputSanitizer.sanitizePassword(user.getPassword()));
         UserModel existingUser = userService.findByLoginName(user.getUserName());
         if (existingUser != null) {
             model.addAttribute("error", "User already exists!");

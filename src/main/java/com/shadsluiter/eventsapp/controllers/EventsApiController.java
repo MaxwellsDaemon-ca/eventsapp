@@ -14,6 +14,7 @@ import com.shadsluiter.eventsapp.models.EventModel;
 import com.shadsluiter.eventsapp.models.UserModel;
 import com.shadsluiter.eventsapp.service.EventService;
 import com.shadsluiter.eventsapp.service.UserService;
+import com.shadsluiter.eventsapp.security.InputSanitizer;
 
 /**
  * REST API controller for managing event data.
@@ -85,7 +86,7 @@ public class EventsApiController {
      */
     @GetMapping("/{organizerid}")
     public ResponseEntity<List<EventModel>> getEventsByOrganizerId(@PathVariable String organizerid) {
-        List<EventModel> events = eventService.findByOrganizerid(organizerid);
+        List<EventModel> events = eventService.findByOrganizerid(InputSanitizer.sanitizeNumeric(organizerid));
         return ResponseEntity.ok(events);
     }
 
@@ -97,7 +98,7 @@ public class EventsApiController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteEvent(@PathVariable String id) {
-        eventService.delete(id);
+        eventService.delete(InputSanitizer.sanitizeNumeric(id));
         return ResponseEntity.ok().build();
     }
 
@@ -134,7 +135,7 @@ public class EventsApiController {
                 return new ResponseEntity<>("Error: event location cannot be null or empty", HttpStatus.BAD_REQUEST);
             }
 
-            EventModel updatedEvent = eventService.updateEvent(id, event);
+            EventModel updatedEvent = eventService.updateEvent(InputSanitizer.sanitizeNumeric(id), event);
 
             if (updatedEvent == null) {
                 return new ResponseEntity<>("Error: event not found", HttpStatus.NOT_FOUND);

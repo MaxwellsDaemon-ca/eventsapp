@@ -25,9 +25,9 @@ public class UserRepository implements UserRepositoryInterface {
 
     @Override
     public UserEntity findByLoginName(String loginName) {
-        String sql = "SELECT u.*, r.role FROM users u LEFT JOIN roles r ON u.id = r.user_id WHERE u.login_name = '" + loginName + "'";
+        String sql = "SELECT u.*, r.role FROM users u LEFT JOIN roles r ON u.id = r.user_id WHERE u.login_name = ?";
         try {
-            List<UserEntity> users = jdbcTemplate.query(sql, new UserWithRolesExtractor());
+            List<UserEntity> users = jdbcTemplate.query(sql, ps -> ps.setString(1, loginName), new UserWithRolesExtractor());
             return users.isEmpty() ? null : users.get(0);
         } catch (EmptyResultDataAccessException e) {
             return null;
@@ -42,8 +42,8 @@ public class UserRepository implements UserRepositoryInterface {
 
     @Override
     public void deleteById(Long id) {
-        String sql = "DELETE FROM users WHERE id = " + id;
-        jdbcTemplate.update(sql);
+        String sql = "DELETE FROM users WHERE id = ?";
+        jdbcTemplate.update(sql, id);
     }
 
     @Override
@@ -58,25 +58,29 @@ public class UserRepository implements UserRepositoryInterface {
                 userEntity.getRoles().add("ROLE_USER");
             }
 
-            String sql = "INSERT INTO users (login_name, password, enabled, account_non_expired, credentials_non_expired, account_non_locked) VALUES ('"
-                    + userEntity.getUserName() + "', '"
-                    + userEntity.getPassword() + "', "
-                    + userEntity.isEnabled() + ", "
-                    + userEntity.isAccountNonExpired() + ", "
-                    + userEntity.isCredentialsNonExpired() + ", "
-                    + userEntity.isAccountNonLocked() + ")";
-            jdbcTemplate.update(sql);
+            String sql = "INSERT INTO users (login_name, password, enabled, account_non_expired, credentials_non_expired, account_non_locked) VALUES (?, ?, ?, ?, ?, ?)";
+            jdbcTemplate.update(sql,
+                userEntity.getUserName(),
+                userEntity.getPassword(),
+                userEntity.isEnabled(),
+                userEntity.isAccountNonExpired(),
+                userEntity.isCredentialsNonExpired(),
+                userEntity.isAccountNonLocked()
+            );
             Long id = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Long.class);
             userEntity.setId(id);
+
         } else {
-            String sql = "UPDATE users SET login_name = '" + userEntity.getUserName()
-                    + "', password = '" + userEntity.getPassword()
-                    + "', enabled = " + userEntity.isEnabled()
-                    + ", account_non_expired = " + userEntity.isAccountNonExpired()
-                    + ", credentials_non_expired = " + userEntity.isCredentialsNonExpired()
-                    + ", account_non_locked = " + userEntity.isAccountNonLocked()
-                    + " WHERE id = " + userEntity.getId();
-            jdbcTemplate.update(sql);
+            String sql = "UPDATE users SET login_name = ?, password = ?, enabled = ?, account_non_expired = ?, credentials_non_expired = ?, account_non_locked = ? WHERE id = ?";
+            jdbcTemplate.update(sql,
+                userEntity.getUserName(),
+                userEntity.getPassword(),
+                userEntity.isEnabled(),
+                userEntity.isAccountNonExpired(),
+                userEntity.isCredentialsNonExpired(),
+                userEntity.isAccountNonLocked(),
+                userEntity.getId()
+            );
         }
 
         // Save roles
@@ -88,28 +92,30 @@ public class UserRepository implements UserRepositoryInterface {
 
     public void saveRoles(UserEntity userEntity) {
         if (userEntity.getRoles() != null) {
+            String sql = "INSERT INTO roles (user_id, role) VALUES (?, ?)";
             for (String role : userEntity.getRoles()) {
-                String sql = "INSERT INTO roles (user_id, role) VALUES (" + userEntity.getId() + ", '" + role + "')";
-                jdbcTemplate.update(sql);
+                jdbcTemplate.update(sql, userEntity.getId(), role);
             }
         }
     }
 
+
     public void deleteRoles(UserEntity userEntity) {
-        String sql = "DELETE FROM roles WHERE user_id = " + userEntity.getId();
-        jdbcTemplate.update(sql);
+        String sql = "DELETE FROM roles WHERE user_id = ?";
+        jdbcTemplate.update(sql, userEntity.getId());
     }
 
     @Override
     public UserEntity findById(Long id) {
-        String sql = "SELECT u.*, r.role FROM users u LEFT JOIN roles r ON u.id = r.user_id WHERE u.id = " + id;
+        String sql = "SELECT u.*, r.role FROM users u LEFT JOIN roles r ON u.id = r.user_id WHERE u.id = ?";
         try {
-            List<UserEntity> users = jdbcTemplate.query(sql, new UserWithRolesExtractor());
+            List<UserEntity> users = jdbcTemplate.query(sql, new Object[]{id}, new UserWithRolesExtractor());
             return users.isEmpty() ? null : users.get(0);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
     }
+
 
     @Override
     public long count() {
