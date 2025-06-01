@@ -59,6 +59,7 @@ public class SecurityConfig {
             .securityMatcher(request -> !request.getRequestURI().startsWith("/api/"))
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+            .requiresChannel(channel -> channel.anyRequest().requiresSecure())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/css/**", "/js/**", "/events", "/events/search", "/users/loginForm", "/users/register").permitAll()
                 .requestMatchers("/events/create", "/events/edit/**", "/events/delete/**").hasRole("ADMIN")
@@ -97,6 +98,7 @@ public class SecurityConfig {
             .securityMatcher("/api/**")
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .requiresChannel(channel -> channel.anyRequest().requiresSecure())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/users/login", "/api/users/register").permitAll()
                 .anyRequest().authenticated()
