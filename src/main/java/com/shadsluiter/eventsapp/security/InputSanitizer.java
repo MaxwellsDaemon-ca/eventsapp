@@ -8,9 +8,6 @@ import java.util.regex.Pattern;
  * 
  * This class demonstrates multiple sanitization approaches based on 
  * the input context (username, password, numeric, generic text).
- * 
- * NOTE: This is for academic purposes — proper parameterized queries 
- * are always the primary defense against SQL injection.
  */
 public class InputSanitizer {
 
